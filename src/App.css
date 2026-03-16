@@ -14,3 +14,190 @@ nav {
   flex-shrink: 0;
 }
 
+.app.light {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.app.dark {
+  background: radial-gradient(1200px circle at 85% -10%, rgba(122, 162, 255, 0.18), transparent 55%),
+    radial-gradient(900px circle at 10% 10%, rgba(255, 184, 107, 0.12), transparent 60%),
+    var(--bg);
+  color: var(--text);
+}
+
+.app {
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.app.dark .navbar {
+  background: rgba(15, 21, 33, 0.92);
+  border-bottom: 1px solid rgba(39, 50, 72, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+.app.dark .search-bar,
+.app.dark .filter-sidebar,
+.app.dark .product-card,
+.app.dark .no-products,
+.app.dark .categories-menu,
+.app.dark .summary-card,
+.app.dark .cart-content,
+.app.dark .banner-section,
+.app.dark .product-section,
+.app.dark .section-header,
+.app.dark .category-buttons-section,
+.app.dark .product-preview,
+.app.dark .product-preview-img,
+.app.dark .category-section,
+.app.dark .category-section-header,
+.app.dark .cart-items-section,
+.app.dark .checkout-summary,
+.app.dark .checkout-form-section,
+.app.dark .order-card,
+.app.dark .orders-empty,
+.app.dark .shipping-info,
+.app.dark .order-items,
+.app.dark .order-summary,
+.app.dark .order-item,
+.app.dark .login-card,
+.app.dark .login-footer,
+.app.dark .contact-card,
+.app.dark .profile-card,
+.app.dark .profile-details,
+.app.dark .address-card {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.app.dark .product-card:hover,
+.app.dark .category-btn.active,
+.app.dark .reset-filters-btn,
+.app.dark .theme-toggle-btn,
+.app.dark .carousel-btn {
+  box-shadow: 0 0 22px rgba(122, 162, 255, 0.35);
+  border-color: rgba(122, 162, 255, 0.45);
+}
+
+.app.dark .product-card h3,
+.app.dark .product-card .category,
+.app.dark p,
+.app.dark a,
+.app.dark .filter-summary p,
+.app.dark .section-header h2,
+.app.dark .category-btn,
+.app.dark .view-all,
+.app.dark .banner-content h2,
+.app.dark .banner-content p {
+  color: var(--text);
+}
+
+.app.dark .price {
+  color: #22c55e;
+}
+
+.app.dark a {
+  color: var(--accent);
+}
+
+.app.dark .cart-badge,
+.app.dark .filter-group button.active,
+.app.dark .reset-filters-btn,
+.app.dark .theme-toggle-btn {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.app.dark label,
+.app.dark .search-input,
+.app.dark .filter-group input,
+.app.dark .filter-group select {
+  color: var(--text);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.app.dark button,
+.app.dark input,
+.app.dark select {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.app.dark .no-products,
+.app.dark .section-header,
+.app.dark .cart-summary,
+.app.dark .products-grid,
+.app.dark .shop-layout,
+.app.dark .home-page {
+  border-radius: 10px;
+}
+
+.app.dark .filter-info,
+.app.dark .item-category,
+.app.dark .order-date,
+.app.dark .summary-row,
+.app.dark .summary-row span,
+.app.dark .item-qty,
+.app.dark .order-summary .summary-row,
+.app.dark .order-success p,
+.app.dark .order-number,
+.app.dark .security-note,
+.app.dark .info-text,
+.app.dark .payment-info,
+.app.dark .empty-cart p,
+.app.dark .empty-checkout p,
+.app.dark .orders-empty p,
+.app.dark .no-products p,
+.app.dark .cart-table th,
+.app.dark .cart-table td,
+.app.dark .order-details p {
+  color: var(--muted);
+}
+
+.app.dark .section-header {
+  border-bottom: 2px solid var(--border);
+}
+
+.app.dark .category-btn {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+}
+
+.app.dark .category-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.app.dark .category-btn.all-btn,
+.app.dark .category-btn.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #0b0f17;
+}
+
+.app.dark .product-card,
+.app.dark .product-preview,
+.app.dark .order-card,
+.app.dark .summary-card,
+.app.dark .checkout-summary,
+.app.dark .checkout-form-section {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.app.dark .carousel-btn {
+  background-color: rgba(19, 27, 41, 0.9);
+  color: var(--text);
+  border: 1px solid rgba(39, 50, 72, 0.7);
+}
+
+.app.dark .carousel-dots .dot {
+  background-color: rgba(122, 162, 255, 0.25);
+}
+
+.app.dark .carousel-dots .dot.active {
+  background-color: var(--accent);
+}

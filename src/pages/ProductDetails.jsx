@@ -1,17 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useDispatch } from 'react-redux'
+import { addToCart as addToCartAction } from '../store/cartSlice'
 import { useProducts } from '../context/ProductContext'
 import '../styles/ProductDetails.css'
 
 function ProductDetails() {
+  const dispatch = useDispatch()
   const { id } = useParams()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const { getProductById } = useProducts()
   const [addedToCart, setAddedToCart] = useState(false)
-  const { addToCart } = useCart()
+  const [currentFrame, setCurrentFrame] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState(0)
+
+  const productImages = useMemo(() => {
+    if (!product) return []
+    const images = product.images?.length ? product.images : (product.image ? [product.image] : [])
+    return images.filter(Boolean)
+  }, [product])
 
   useEffect(() => {
     const p = getProductById(id)
@@ -19,12 +29,35 @@ function ProductDetails() {
     else setError('Product not found')
   }, [id, getProductById])
 
+  useEffect(() => {
+    setCurrentFrame(0)
+  }, [id, productImages.length])
+
   // no network request; just grab from context-provided list
 
   const handleAddToCart = () => {
-    addToCart(product)
+    dispatch(addToCartAction(product))
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
+  }
+
+  const handleDragStart = (clientX) => {
+    if (productImages.length <= 1) return
+    setIsDragging(true)
+    setDragStart(clientX)
+  }
+
+  const handleDragMove = (clientX) => {
+    if (!isDragging || productImages.length <= 1) return
+    const diff = clientX - dragStart
+    if (Math.abs(diff) < 20) return
+    const direction = diff > 0 ? -1 : 1
+    setCurrentFrame((prev) => (prev + direction + productImages.length) % productImages.length)
+    setDragStart(clientX)
+  }
+
+  const handleDragEnd = () => {
+    setIsDragging(false)
   }
 
   if (loading) return <div className="product-details-container"><p>Loading product...</p></div>
@@ -37,7 +70,26 @@ function ProductDetails() {
       
       <div className="product-details">
         <div className="product-image-section">
-          <img src={product.image} alt={product.title} className="product-detail-image" />
+          <div
+            className={`product-360-view ${productImages.length > 1 ? 'is-rotatable' : ''}`}
+            onMouseDown={(e) => handleDragStart(e.clientX)}
+            onMouseMove={(e) => handleDragMove(e.clientX)}
+            onMouseUp={handleDragEnd}
+            onMouseLeave={handleDragEnd}
+            onTouchStart={(e) => handleDragStart(e.touches[0]?.clientX || 0)}
+            onTouchMove={(e) => handleDragMove(e.touches[0]?.clientX || 0)}
+            onTouchEnd={handleDragEnd}
+          >
+            <img
+              src={productImages[currentFrame] || product.image}
+              alt={product.title}
+              className="product-detail-image"
+              draggable={false}
+            />
+            {productImages.length > 1 && (
+              <div className="rotate-hint">Drag to rotate</div>
+            )}
+          </div>
         </div>
         
         <div className="product-info-section">

@@ -1,12 +1,19 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from '../context/AuthContext'
 import { useOrders } from '../context/OrderContext'
+import {
+  selectCartItems,
+  selectCartTotalPrice,
+  clearCart,
+} from '../store/cartSlice'
 import '../styles/Checkout.css'
 
 function Checkout() {
-  const { cartItems, getTotalPrice, clearCart } = useCart()
+  const dispatch = useDispatch()
+  const cartItems = useSelector(selectCartItems)
+  const subtotal = useSelector(selectCartTotalPrice)
   const { logout, user, role, isLoading } = useAuth()
   const { addOrder } = useOrders()
   const navigate = useNavigate()
@@ -54,7 +61,6 @@ function Checkout() {
     }
 
     // Calculate totals
-    const subtotal = getTotalPrice()
     const tax = subtotal * 0.1
     const total = subtotal + tax
 
@@ -70,7 +76,7 @@ function Checkout() {
 
     // Simulate order placement
     setOrderPlaced(true)
-    clearCart()
+    dispatch(clearCart())
     
     setTimeout(() => {
       alert('Order placed successfully! Thank you for shopping with ShopZone.')
@@ -108,7 +114,6 @@ function Checkout() {
     )
   }
 
-  const subtotal = getTotalPrice()
   const tax = subtotal * 0.1
   const total = subtotal + tax
 

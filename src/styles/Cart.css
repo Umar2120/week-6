@@ -356,3 +356,65 @@
     font-size: 0.8rem;
   }
 }
+
+/* Dark Theme Overrides */
+.app.dark .cart-container h1 {
+  color: var(--text);
+}
+
+.app.dark .empty-cart,
+.app.dark .cart-items-section,
+.app.dark .summary-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.app.dark .cart-table thead {
+  background-color: var(--surface-2);
+  border-bottom: 2px solid var(--border);
+}
+
+.app.dark .cart-table tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.app.dark .cart-table tbody tr:hover {
+  background-color: var(--surface-2);
+}
+
+.app.dark .cart-item-image {
+  background-color: var(--surface-2);
+}
+
+.app.dark .item-title {
+  color: var(--accent);
+}
+
+.app.dark .item-category {
+  color: var(--muted);
+}
+
+.app.dark .qty-btn {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app.dark .qty-btn:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: #0b0f17;
+}
+
+.app.dark .total {
+  color: var(--text);
+}
+
+.app.dark .clear-cart-btn {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app.dark .continue-shopping-link {
+  color: var(--accent);
+}

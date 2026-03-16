@@ -112,3 +112,30 @@
     font-size: 1.5rem;
   }
 }
+
+/* Dark Theme Overrides */
+.app.dark .contact-container h1 {
+  color: var(--text);
+}
+
+.app.dark .contact-form {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.app.dark .form-group label {
+  color: var(--text);
+}
+
+.app.dark .form-group input,
+.app.dark .form-group textarea {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app.dark .form-group input:focus,
+.app.dark .form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.2);
+}

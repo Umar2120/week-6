@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { selectThemeMode } from './store/themeSlice'
 import Navigation from './components/Navigation'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
@@ -15,10 +18,18 @@ import Profile from './pages/Profile'
 import './App.css'
 
 function App() {
+  const themeMode = useSelector(selectThemeMode)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = themeMode
+    document.documentElement.style.colorScheme = themeMode
+  }, [themeMode])
+
   return (
-    <Router>
-      <Navigation />
-      <Routes>
+    <div className={`app ${themeMode}`}>
+      <Router>
+        <Navigation />
+        <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetails />} />
@@ -60,6 +71,7 @@ function App() {
         />
       </Routes>
     </Router>
+  </div>
   )
 }
 

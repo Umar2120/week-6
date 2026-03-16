@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from '../context/AuthContext'
-import { useCart } from '../context/CartContext'
 import { useOrders } from '../context/OrderContext'
 import { Link, useNavigate } from 'react-router-dom'
+import { selectCartItems, selectCartTotalPrice, removeFromCart, updateQuantity } from '../store/cartSlice'
 import '../styles/Profile.css'
 
 function Profile() {
+  const dispatch = useDispatch()
   const { user, logout, isLoading } = useAuth()
-  const { cartItems, removeFromCart, updateQuantity } = useCart()
+  const cartItems = useSelector(selectCartItems)
+  const cartTotal = useSelector(selectCartTotalPrice)
   const { getOrdersForUser } = useOrders()
   const navigate = useNavigate()
   const [profileImage, setProfileImage] = useState(null)
@@ -44,8 +47,6 @@ function Profile() {
     logout()
     navigate('/')
   }
-
-  const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
   return (
     <div className="profile-page">
@@ -107,13 +108,13 @@ function Profile() {
                         <td className="product-name">{item.title}</td>
                         <td className="price">₹{item.price.toFixed(2)}</td>
                         <td className="quantity">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+                          <button onClick={() => dispatch(updateQuantity({ productId: item.id, quantity: item.quantity - 1 }))} disabled={item.quantity <= 1}>-</button>
                           <span>{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+                          <button onClick={() => dispatch(updateQuantity({ productId: item.id, quantity: item.quantity + 1 }))}>+</button>
                         </td>
                         <td className="total">₹{(item.price * item.quantity).toFixed(2)}</td>
                         <td className="action">
-                          <button className="remove-btn" onClick={() => removeFromCart(item.id)}>Remove</button>
+                          <button className="remove-btn" onClick={() => dispatch(removeFromCart(item.id))}>Remove</button>
                         </td>
                       </tr>
                     ))}

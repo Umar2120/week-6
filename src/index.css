@@ -1,15 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
 
-  color: #333;
-  background-color: #fff;
+  --bg: #f6f8ff;
+  --bg-alt: #eef1ff;
+  --surface: #ffffff;
+  --surface-2: #f3f5ff;
+  --surface-3: #e9edff;
+  --text: #1e2432;
+  --muted: #5c6b7f;
+  --accent: #5b7cff;
+  --accent-2: #ff8f5c;
+  --border: #dde4ff;
+  --success: #39b87c;
+  --danger: #ff5d6c;
+  --warning: #f0b84a;
+
+  color: var(--text);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0f17;
+  --bg-alt: #0f1521;
+  --surface: #141c2b;
+  --surface-2: #1b2538;
+  --surface-3: #222f45;
+  --text: #e8edf5;
+  --muted: #a2afbd;
+  --accent: #7aa2ff;
+  --accent-2: #ffb86b;
+  --border: #273248;
+  --success: #52d49e;
+  --danger: #ff6b6b;
+  --warning: #f5c25a;
 }
 
 * {
@@ -27,20 +59,25 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 a {
-  color: #667eea;
+  color: #7aa2ff;
   text-decoration: inherit;
-  transition: color 0.3s;
+  transition: color 0.3s, text-shadow 0.3s;
 }
 
 a:hover {
-  color: #764ba2;
+  color: #9db9ff;
+  text-shadow: 0 0 12px rgba(122, 162, 255, 0.35);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #333;
+  color: inherit;
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.2px;
 }
 
 button {
@@ -56,18 +93,6 @@ input, textarea {
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  outline: 3px solid rgba(122, 162, 255, 0.6);
+  outline-offset: 2px;
 }

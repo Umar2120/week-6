@@ -1,15 +1,24 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  selectCartItems,
+  selectCartTotalPrice,
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+} from '../store/cartSlice'
 import '../styles/Cart.css'
 
 function Cart() {
-  const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart()
+  const dispatch = useDispatch()
+  const cartItems = useSelector(selectCartItems)
+  const cartTotalPrice = useSelector(selectCartTotalPrice)
   const [showClearedMessage, setShowClearedMessage] = useState(false)
   const navigate = useNavigate()
 
   const handleClearCart = () => {
-    clearCart()
+    dispatch(clearCart())
     setShowClearedMessage(true)
     setTimeout(() => setShowClearedMessage(false), 3000)
   }
@@ -64,7 +73,7 @@ function Cart() {
                   <td className="quantity">
                     <button 
                       className="qty-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => dispatch(updateQuantity({ productId: item.id, quantity: item.quantity - 1 }))}
                       disabled={item.quantity === 1}
                     >
                       −
@@ -72,7 +81,7 @@ function Cart() {
                     <span className="qty-value">{item.quantity}</span>
                     <button 
                       className="qty-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => dispatch(updateQuantity({ productId: item.id, quantity: item.quantity + 1 }))}
                     >
                       +
                     </button>
@@ -81,7 +90,7 @@ function Cart() {
                   <td className="action">
                     <button 
                       className="remove-btn"
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => dispatch(removeFromCart(item.id))}
                     >
                       Remove
                     </button>
@@ -98,7 +107,7 @@ function Cart() {
             
             <div className="summary-row">
               <span>Subtotal:</span>
-              <span>₹{getTotalPrice().toFixed(2)}</span>
+              <span>₹{cartTotalPrice.toFixed(2)}</span>
             </div>
             
             <div className="summary-row">
@@ -108,12 +117,12 @@ function Cart() {
             
             <div className="summary-row">
               <span>Tax:</span>
-              <span>₹{(getTotalPrice() * 0.1).toFixed(2)}</span>
+              <span>₹{(cartTotalPrice * 0.1).toFixed(2)}</span>
             </div>
             
             <div className="summary-row total-row">
               <span>Total:</span>
-              <span>₹{(getTotalPrice() * 1.1).toFixed(2)}</span>
+              <span>₹{(cartTotalPrice * 1.1).toFixed(2)}</span>
             </div>
 
             <button className="checkout-btn" onClick={handleCheckout}>

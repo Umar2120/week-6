@@ -188,3 +188,44 @@
 .logout-link:hover {
   color: #764ba2;
 }
+
+/* Dark Theme Overrides */
+.app.dark .login-container {
+  background: radial-gradient(1200px circle at 20% -20%, rgba(122, 162, 255, 0.2), transparent 60%),
+    radial-gradient(800px circle at 90% 0%, rgba(255, 184, 107, 0.18), transparent 65%),
+    var(--bg);
+}
+
+.app.dark .login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.app.dark .login-header {
+  background: linear-gradient(135deg, #1d2740 0%, #2a3450 100%);
+}
+
+.app.dark .divider {
+  color: var(--muted);
+}
+
+.app.dark .divider::before,
+.app.dark .divider::after {
+  background-color: var(--border);
+}
+
+.app.dark .info-text,
+.app.dark .security-note {
+  color: var(--muted);
+}
+
+.app.dark .login-form input {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app.dark .continue-link {
+  background-color: var(--surface-2);
+  color: var(--accent);
+}

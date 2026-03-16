@@ -83,10 +83,55 @@
   transition: color 0.3s;
 }
 
+.theme-toggle-btn {
+  border: 1px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
 .nav-links a:hover,
 .nav-links button:hover {
-  color: #ff6b6b;
+  color: #ffd38c;
 }
+
+.app.dark .navbar {
+  background: #122a54;
+}
+
+.app.dark .nav-links a,
+.app.dark .nav-links button,
+.app.dark .categories-btn {
+  color: #d2e6ff;
+}
+
+.app.dark .nav-links a:hover,
+.app.dark .nav-links button:hover,
+.app.dark .categories-btn:hover {
+  color: #a8cdfa;
+}
+
+.app.dark .categories-menu {
+  background-color: #14345f;
+  border: 1px solid #2d5d9c;
+}
+
+.app.dark .category-option {
+  color: #e2ecff !important;
+}
+
+.app.dark .category-option:hover {
+  background-color: #1b4578;
+  color: #fff !important;
+}
+
 
 /* Categories Dropdown */
 .categories-dropdown {
@@ -222,6 +267,20 @@
   .cart-link {
     font-size: 1.3rem;
   }
+}
+
+/* Dark Theme Overrides */
+.app.dark .search-bar {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.app.dark .search-input::placeholder {
+  color: var(--muted);
+}
+
+.app.dark .nav-brand {
+  color: var(--text);
 }
 
 

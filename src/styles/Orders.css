@@ -310,3 +310,61 @@
     width: auto;
   }
 }
+
+/* Dark Theme Overrides */
+.app.dark .orders-container {
+  background-color: transparent;
+}
+
+.app.dark .orders-container h1 {
+  color: var(--text);
+}
+
+.app.dark .orders-empty,
+.app.dark .order-card,
+.app.dark .shipping-info,
+.app.dark .order-items,
+.app.dark .order-summary,
+.app.dark .order-item {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.app.dark .order-header {
+  background: linear-gradient(135deg, #1c2840 0%, #2b3550 100%);
+}
+
+.app.dark .shipping-info h4,
+.app.dark .order-items h4,
+.app.dark .item-title {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.app.dark .shipping-info p,
+.app.dark .item-qty,
+.app.dark .item-price,
+.app.dark .summary-row {
+  color: var(--muted);
+}
+
+.app.dark .summary-row.total {
+  color: var(--text);
+  border-top-color: var(--border);
+}
+
+.app.dark .summary-row.total span:last-child {
+  color: var(--accent);
+}
+
+.app.dark .order-details {
+  border-top-color: var(--border);
+}
+
+.app.dark .order-item {
+  border-color: var(--border);
+}
+
+.app.dark .item-img {
+  background-color: var(--surface-2);
+}

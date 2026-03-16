@@ -4,16 +4,22 @@ import '../styles/Home.css'
 import { useProducts } from '../context/ProductContext'
 
 function Home() {
-  const { products } = useProducts()
+  const { products, loadMoreProducts, hasMore, loading: productsLoading, getProductsByCategory } = useProducts()
   const [loading, setLoading] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [dragStart, setDragStart] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState(0)
   const [filteredCategory, setFilteredCategory] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
+  const [isHomeFiltersOpen, setIsHomeFiltersOpen] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(20)
   const navigate = useNavigate()
   const location = useLocation()
   const filteredRef = useRef(null)
+  const loaderRef = useRef(null)
+  const isLoadingMoreRef = useRef(false)
 
   // derive categories dynamically from product list; ensures adding a product automatically creates its category
   const categories = Array.from(
@@ -56,6 +62,14 @@ function Home() {
     }
   ]
 
+  const priceBuckets = [
+    { label: 'All', min: 0, max: Infinity },
+    { label: '0 - 5,000', min: 0, max: 5000 },
+    { label: '5,001 - 10,000', min: 5001, max: 10000 },
+    { label: '10,001 - 15,000', min: 10001, max: 15000 },
+    { label: '15,001+', min: 15001, max: Infinity },
+  ]
+
   // products come from context; no network request required
   useEffect(() => {
     // parse category query parameter when landing on home
@@ -63,6 +77,8 @@ function Home() {
     const cat = params.get('category')
     if (cat) {
       setFilteredCategory(cat)
+    } else {
+      setFilteredCategory(null)
     }
   }, [location.search])
 
@@ -75,19 +91,39 @@ function Home() {
 
   // no fetch; products come from local data via context
 
-  // fetch products matching a category; caller can optionally specify a limit
-  const getProductsByCategory = (category, limit = null) => {
-    const filtered = products.filter(
-      p => p.category.toLowerCase() === category.toLowerCase()
-    )
-    // when limit is provided, return a slice for preview sections
+  const getCategoryProducts = (category, limit = null) => {
+    const filtered = getProductsByCategory(category)
     return limit ? filtered.slice(0, limit) : filtered
+  }
+
+  const getFilteredProducts = () => {
+    if (!filteredCategory) return []
+    let filtered = getCategoryProducts(filteredCategory)
+
+    if (searchTerm.trim() !== '') {
+      const searchLower = searchTerm.toLowerCase()
+      filtered = filtered.filter(product =>
+        product.title.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower)
+      )
+    }
+
+    filtered = filtered.filter(product => {
+      const price = product.price
+      return price >= priceRange.min && price <= priceRange.max
+    })
+
+    return filtered
   }
 
   const handleCategoryClick = (category) => {
     // determine next state
     const newCat = filteredCategory === category ? null : category
     setFilteredCategory(newCat)
+    if (newCat) {
+      setSearchTerm('')
+      setPriceRange({ min: 0, max: Infinity })
+    }
     // update URL so the selection persists and navbar clicks work later
     if (newCat) {
       navigate(`/?category=${encodeURIComponent(newCat)}`)
@@ -136,6 +172,28 @@ function Home() {
       filteredRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [filteredCategory])
+
+  useEffect(() => {
+    if (!loaderRef.current) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry.isIntersecting) return
+        if (isLoadingMoreRef.current || !hasMore) return
+        isLoadingMoreRef.current = true
+        loadMoreProducts(20)
+        setVisibleCount((prev) => prev + 20)
+        setTimeout(() => {
+          isLoadingMoreRef.current = false
+        }, 200)
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(loaderRef.current)
+    return () => observer.disconnect()
+  }, [loadMoreProducts, hasMore])
+
+  const filteredProducts = getFilteredProducts().slice(0, visibleCount)
 
   if (loading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
@@ -203,6 +261,8 @@ function Home() {
             className="category-btn all-btn"
             onClick={() => {
               setFilteredCategory(null)
+              setSearchTerm('')
+              setPriceRange({ min: 0, max: Infinity })
               navigate('/')
             }}
           >
@@ -218,7 +278,85 @@ function Home() {
             </button>
           ))}
         </div>
+        <button
+          className="home-filter-toggle-btn"
+          type="button"
+          onClick={() => setIsHomeFiltersOpen(true)}
+        >
+          Filters
+        </button>
       </div>
+
+      <div
+        className={`home-filter-overlay ${isHomeFiltersOpen ? 'open' : ''}`}
+        onClick={() => setIsHomeFiltersOpen(false)}
+      />
+      <aside className={`home-filter-sidebar ${isHomeFiltersOpen ? 'open' : ''}`}>
+        <div className="home-filter-header">
+          <h3>Filters</h3>
+          <button
+            className="home-close-filters-btn"
+            type="button"
+            onClick={() => setIsHomeFiltersOpen(false)}
+            aria-label="Close filters"
+          >
+            Close
+          </button>
+        </div>
+        <div className="home-filter-group">
+          <label htmlFor="homeCategory">Category</label>
+          <select
+            id="homeCategory"
+            value={filteredCategory || 'all'}
+            onChange={(e) => {
+              const value = e.target.value
+              if (value === 'all') {
+                setFilteredCategory(null)
+                setSearchTerm('')
+                setPriceRange({ min: 0, max: Infinity })
+                navigate('/')
+              } else {
+                setFilteredCategory(value)
+                setSearchTerm('')
+                setPriceRange({ min: 0, max: Infinity })
+                navigate(`/?category=${encodeURIComponent(value)}`)
+              }
+            }}
+          >
+            <option value="all">All Categories</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="home-filter-group">
+          <label htmlFor="homeSearch">Search</label>
+          <input
+            id="homeSearch"
+            type="text"
+            value={searchTerm}
+            placeholder="Search within category..."
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="home-filter-group">
+          <span>Price Range</span>
+          <div className="home-price-buttons">
+            {priceBuckets.map((bucket) => (
+              <button
+                key={bucket.label}
+                type="button"
+                className={priceRange.min === bucket.min && priceRange.max === bucket.max ? 'active' : ''}
+                onClick={() => setPriceRange({ min: bucket.min, max: bucket.max })}
+              >
+                {bucket.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </aside>
 
       {/* Filtered Results Section (appears when a category is selected) */}
       {filteredCategory && (
@@ -230,19 +368,41 @@ function Home() {
             </button>
           </div>
           <div className="products-display">
-            {getProductsByCategory(filteredCategory).map(product => (
-              <Link
-                key={product.id}
-                to={`/product/${product.id}`}
-                className="product-preview"
-              >
-                <div className="product-preview-img">
-                  <img src={product.image} alt={product.title} />
-                </div>
-                <h4>{product.title}</h4>
-                <p className="price">₹{product.price.toFixed(2)}</p>
-              </Link>
-            ))}
+            {filteredProducts.length === 0 ? (
+              <div className="no-products">
+                <p>No products match the filters</p>
+              </div>
+            ) : (
+              filteredProducts.map(product => (
+                <Link
+                  key={product.id}
+                  to={`/product/${product.id}`}
+                  className="product-preview"
+                >
+                  <div className="product-preview-img">
+                    <img src={product.image} alt={product.title} />
+                  </div>
+                  <h4>{product.title}</h4>
+                  <div className="rating-row">
+                    <span className="rating-value">⭐ {product.rating?.rate || 'N/A'}</span>
+                    <span className="rating-count">({product.rating?.count || 0})</span>
+                  </div>
+                  <div className="price-row">
+                    <p className="price">₹{product.price.toFixed(2)}</p>
+                    <Link
+                      className="buy-btn"
+                      to={`/product/${product.id}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      Buy Now
+                    </Link>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+          <div className="infinite-loader" ref={loaderRef}>
+            {productsLoading ? 'Loading more products...' : hasMore ? 'Scroll for more products' : 'You have reached the end'}
           </div>
         </section>
       )}
@@ -259,7 +419,7 @@ function Home() {
               </Link>
             </div>
             <div className="products-display">
-              {getProductsByCategory('Electronics', 12).map(product => (
+              {getCategoryProducts('Electronics', 12).map(product => (
                 <Link
                   key={product.id}
                   to={`/product/${product.id}`}
@@ -269,7 +429,20 @@ function Home() {
                     <img src={product.image} alt={product.title} />
                   </div>
                   <h4>{product.title}</h4>
-                  <p className="price">₹{product.price.toFixed(2)}</p>
+                  <div className="rating-row">
+                    <span className="rating-value">⭐ {product.rating?.rate || 'N/A'}</span>
+                    <span className="rating-count">({product.rating?.count || 0})</span>
+                  </div>
+                  <div className="price-row">
+                    <p className="price">₹{product.price.toFixed(2)}</p>
+                    <Link
+                      className="buy-btn"
+                      to={`/product/${product.id}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      Buy Now
+                    </Link>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -284,7 +457,7 @@ function Home() {
               </Link>
             </div>
             <div className="products-display">
-              {getProductsByCategory('Jewelery', 12).map(product => (
+              {getCategoryProducts('Jewelery', 12).map(product => (
                 <Link
                   key={product.id}
                   to={`/product/${product.id}`}
@@ -294,7 +467,20 @@ function Home() {
                     <img src={product.image} alt={product.title} />
                   </div>
                   <h4>{product.title}</h4>
-                  <p className="price">₹{product.price.toFixed(2)}</p>
+                  <div className="rating-row">
+                    <span className="rating-value">⭐ {product.rating?.rate || 'N/A'}</span>
+                    <span className="rating-count">({product.rating?.count || 0})</span>
+                  </div>
+                  <div className="price-row">
+                    <p className="price">₹{product.price.toFixed(2)}</p>
+                    <Link
+                      className="buy-btn"
+                      to={`/product/${product.id}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      Buy Now
+                    </Link>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -309,7 +495,7 @@ function Home() {
               </Link>
             </div>
             <div className="products-display">
-              {getProductsByCategory("Men's Clothing", 12).map(product => (
+              {getCategoryProducts("Men's Clothing", 12).map(product => (
                 <Link
                   key={product.id}
                   to={`/product/${product.id}`}
@@ -319,7 +505,20 @@ function Home() {
                     <img src={product.image} alt={product.title} />
                   </div>
                   <h4>{product.title}</h4>
-                  <p className="price">₹{product.price.toFixed(2)}</p>
+                  <div className="rating-row">
+                    <span className="rating-value">⭐ {product.rating?.rate || 'N/A'}</span>
+                    <span className="rating-count">({product.rating?.count || 0})</span>
+                  </div>
+                  <div className="price-row">
+                    <p className="price">₹{product.price.toFixed(2)}</p>
+                    <Link
+                      className="buy-btn"
+                      to={`/product/${product.id}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      Buy Now
+                    </Link>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -334,7 +533,7 @@ function Home() {
               </Link>
             </div>
             <div className="products-display">
-              {getProductsByCategory("Women's Clothing", 12).map(product => (
+              {getCategoryProducts("Women's Clothing", 12).map(product => (
                 <Link
                   key={product.id}
                   to={`/product/${product.id}`}
@@ -344,7 +543,20 @@ function Home() {
                     <img src={product.image} alt={product.title} />
                   </div>
                   <h4>{product.title}</h4>
-                  <p className="price">₹{product.price.toFixed(2)}</p>
+                  <div className="rating-row">
+                    <span className="rating-value">⭐ {product.rating?.rate || 'N/A'}</span>
+                    <span className="rating-count">({product.rating?.count || 0})</span>
+                  </div>
+                  <div className="price-row">
+                    <p className="price">₹{product.price.toFixed(2)}</p>
+                    <Link
+                      className="buy-btn"
+                      to={`/product/${product.id}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      Buy Now
+                    </Link>
+                  </div>
                 </Link>
               ))}
             </div>

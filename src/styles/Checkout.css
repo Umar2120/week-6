@@ -344,3 +344,80 @@
     font-size: 1.2rem;
   }
 }
+
+/* Dark Theme Overrides */
+.app.dark .checkout-container h1 {
+  color: var(--text);
+}
+
+.app.dark .empty-checkout,
+.app.dark .order-success,
+.app.dark .checkout-summary,
+.app.dark .checkout-form-section {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.app.dark .checkout-summary h2,
+.app.dark .checkout-form-section h2,
+.app.dark .form-section h3,
+.app.dark .order-success h2 {
+  color: var(--text);
+}
+
+.app.dark .summary-items {
+  border-bottom: 2px solid var(--border);
+}
+
+.app.dark .summary-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.app.dark .item-name {
+  color: var(--text);
+}
+
+.app.dark .item-qty {
+  color: var(--muted);
+}
+
+.app.dark .total-row {
+  border-bottom: 1px solid var(--border);
+}
+
+.app.dark .total-row.final {
+  color: var(--accent);
+  border-top: 2px solid var(--accent);
+}
+
+.app.dark .form-group label {
+  color: var(--text);
+}
+
+.app.dark .form-group input {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app.dark .form-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.2);
+}
+
+.app.dark .payment-info {
+  background-color: var(--surface-2);
+  color: var(--muted);
+}
+
+.app.dark .back-to-cart-link,
+.app.dark .logout-btn {
+  background-color: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.app.dark .back-to-cart-link:hover {
+  background-color: var(--surface-3);
+  color: var(--accent);
+}

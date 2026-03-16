@@ -1,15 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { useCart } from '../context/CartContext'
+import { useState, useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from '../context/AuthContext'
 import { useProducts } from '../context/ProductContext'
+import { selectCartTotalItems } from '../store/cartSlice'
+import { selectThemeMode, toggleTheme } from '../store/themeSlice'
+import { selectFilters, setCategory, setSearchTerm } from '../store/filterSlice'
 import '../styles/Navigation.css'
 
 function Navigation() {
-  const { getTotalItems } = useCart()
+  const cartCount = useSelector(selectCartTotalItems)
+  const themeMode = useSelector(selectThemeMode)
+  const dispatch = useDispatch()
+  const filters = useSelector(selectFilters)
   const { isAuthenticated, role, logout } = useAuth()
-  const cartCount = getTotalItems()
-  const [searchTerm, setSearchTerm] = useState('')
   const [showCategories, setShowCategories] = useState(false)
   const navigate = useNavigate()
 
@@ -21,23 +25,28 @@ function Navigation() {
       .map(cat => cat.replace(/\b\w/g, c => c.toUpperCase()))
   ]
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = useCallback((category) => {
     setShowCategories(false)
     if (category === 'All Products') {
+      dispatch(setCategory('all'))
       navigate('/')
     } else {
-      // send user to home with a query param so Home component can scroll and filter
+      const normalized = category.toLowerCase()
+      dispatch(setCategory(normalized))
+      // keep Home category section behavior with query param
       navigate(`/?category=${encodeURIComponent(category)}`)
     }
-  }
+  }, [dispatch, navigate])
 
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     e.preventDefault()
-    if (searchTerm.trim()) {
-      navigate(`/shop?search=${encodeURIComponent(searchTerm.trim())}`)
-      setSearchTerm('')
+    if (filters.searchTerm.trim()) {
+      // stay on shop so results update live
+      if (window.location.pathname !== '/shop') {
+        navigate('/shop')
+      }
     }
-  }
+  }, [filters.searchTerm, navigate])
 
   return (
     <nav className="navbar">
@@ -47,8 +56,13 @@ function Navigation() {
         <input
           type="text"
           placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={filters.searchTerm}
+          onChange={(e) => {
+            dispatch(setSearchTerm(e.target.value))
+            if (window.location.pathname !== '/shop') {
+              navigate('/shop')
+            }
+          }}
           className="search-input"
         />
         <button type="submit" className="search-btn">🔍</button>
@@ -82,6 +96,15 @@ function Navigation() {
         {role === 'admin' && <li><Link to="/add-product">✏️ Add Product</Link></li>}
         {isAuthenticated && <li><Link to="/profile">👤 Profile</Link></li>}
         {isAuthenticated && <li><Link to="/orders">📦 Orders</Link></li>}
+        <li>
+          <button
+            type="button"
+            className="theme-toggle-btn"
+            onClick={() => dispatch(toggleTheme())}
+          >
+            {themeMode === 'light' ? '🌙 Dark' : '☀️ Light'}
+          </button>
+        </li>
         <li>
           <Link to="/cart" className="cart-link">
             🛒
